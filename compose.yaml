@@ -1,0 +1,65 @@
+x-db-env: &db-env
+  MYSQL_DATABASE: panel
+  MYSQL_USER: pterodactyl
+  MYSQL_PASSWORD: \${DB_PASSWORD:?Create .env with DB_PASSWORD}
+  MYSQL_ROOT_PASSWORD: \${DB_ROOT_PASSWORD:?Create .env with DB_ROOT_PASSWORD}
+
+services:
+  database:
+    image: mariadb:11
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment: *db-env
+    volumes:
+      - ./.data/database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  cache:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - ./.data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  panel:
+    image: ghcr.io/pterodactyl/panel:latest
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      APP_URL: \${APP_URL:-http://localhost:8080}
+      APP_TIMEZONE: Asia/Kolkata
+      APP_SERVICE_AUTHOR: \${APP_SERVICE_AUTHOR:-admin@example.invalid}
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_ENVIRONMENT_ONLY: "false"
+      DB_HOST: database
+      DB_PORT: "3306"
+      DB_DATABASE: panel
+      DB_USERNAME: pterodactyl
+      DB_PASSWORD: \${DB_PASSWORD:?Create .env with DB_PASSWORD}
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      QUEUE_DRIVER: redis
+      REDIS_HOST: cache
+      REDIS_PORT: "6379"
+      MAIL_DRIVER: log
+      MAIL_FROM: \${MAIL_FROM:-noreply@example.invalid}
+    volumes:
+      - ./.data/panel-var:/app/var
+      - ./.data/nginx:/etc/nginx/http.d
+      - ./.data/certs:/etc/letsencrypt
+      - ./.data/panel-logs:/app/storage/logs
