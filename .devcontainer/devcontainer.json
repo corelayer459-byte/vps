@@ -1,18 +1,15 @@
 {
-  "name": "Ptero MC Control Kit",
+  "name": "Pterodactyl Panel development (Codespaces)",
   "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
   "forwardPorts": [
-    8080,
-    25565
+    8080
   ],
   "portsAttributes": {
     "8080": {
-      "label": "Panel web UI",
-      "onAutoForward": "notify",
-      "visibility": "private"
-    },
-    "25565": {
-      "label": "Minecraft Java",
+      "label": "Real Pterodactyl Panel (temporary)",
       "onAutoForward": "notify",
       "visibility": "private"
     }
