@@ -1,0 +1,22 @@
+services:
+  wings:
+    image: ghcr.io/pterodactyl/wings:latest
+    profiles: ["wings"]
+    restart: unless-stopped
+    tty: true
+    depends_on:
+      panel:
+        condition: service_started
+    ports:
+      - "8081:8081"
+      - "2022:2022"
+    environment:
+      TZ: Asia/Kolkata
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers/:/var/lib/docker/containers/
+      - ./.data/wings/etc:/etc/pterodactyl
+      - /var/lib/pterodactyl/:/var/lib/pterodactyl/
+      - /var/log/pterodactyl/:/var/log/pterodactyl/
+      - /tmp/pterodactyl/:/tmp/pterodactyl/
+      - /run/wings/machine-id/:/run/wings/machine-id/
