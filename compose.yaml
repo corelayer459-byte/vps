@@ -13,7 +13,7 @@ services:
     volumes:
       - ./.data/database:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
       interval: 10s
       timeout: 5s
       retries: 15
@@ -40,9 +40,9 @@ services:
     ports:
       - "8080:80"
     environment:
-      APP_URL: \${APP_URL:-http://localhost:8080}
+      APP_URL: ${APP_URL:-http://localhost:8080}
       APP_TIMEZONE: Asia/Kolkata
-      APP_SERVICE_AUTHOR: \${APP_SERVICE_AUTHOR:-admin@example.invalid}
+      APP_SERVICE_AUTHOR: ${APP_SERVICE_AUTHOR:-admin@example.invalid}
       APP_ENV: production
       APP_DEBUG: "false"
       APP_ENVIRONMENT_ONLY: "false"
@@ -57,7 +57,9 @@ services:
       REDIS_HOST: cache
       REDIS_PORT: "6379"
       MAIL_DRIVER: log
-      MAIL_FROM: \${MAIL_FROM:-noreply@example.invalid}
+      TRUSTED_PROXIES: "*"
+      RECAPTCHA_ENABLED: "false"
+      MAIL_FROM: ${MAIL_FROM:-noreply@example.invalid}
     volumes:
       - ./.data/panel-var:/app/var
       - ./.data/nginx:/etc/nginx/http.d
