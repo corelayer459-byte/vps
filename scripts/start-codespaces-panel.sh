@@ -16,8 +16,8 @@ if ! command -v openssl >/dev/null 2>&1; then
 fi
 
 if [[ ! -f .env ]]; then
-  if [[ -n "\${CODESPACE_NAME:-}" && -n "\${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}" ]]; then
-    app_url="https://\${CODESPACE_NAME}-8080.\${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
+  if [[ -n "${CODESPACE_NAME:-}" && -n "${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}" ]]; then
+    app_url="https://${CODESPACE_NAME}-8080.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
   else
     app_url="http://localhost:8080"
   fi
